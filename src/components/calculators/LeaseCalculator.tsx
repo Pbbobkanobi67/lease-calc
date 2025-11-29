@@ -2,13 +2,27 @@
 
 import { useLeaseCalculator } from '@/hooks/useLeaseCalculator';
 import { NumberInput } from '@/components/ui/NumberInput';
+import { VehicleSelector } from '@/components/ui/VehicleSelector';
+import { SubmitRate } from '@/components/ui/SubmitRate';
 import { formatCurrency, formatCurrencyDetailed } from '@/lib/utils';
-import { ChevronDown, ChevronUp, RotateCcw } from 'lucide-react';
+import { ChevronDown, ChevronUp, RotateCcw, Search, Plus } from 'lucide-react';
 import { useState } from 'react';
 
 export function LeaseCalculator() {
-  const { inputs, updateInput, calculation, reset } = useLeaseCalculator();
+  const { inputs, updateInput, calculation, reset, setInputs } = useLeaseCalculator();
   const [showAdvanced, setShowAdvanced] = useState(false);
+  const [showVehicleSelector, setShowVehicleSelector] = useState(false);
+  const [showSubmitRate, setShowSubmitRate] = useState(false);
+
+  const handleVehicleSelect = (rate: { moneyFactor: number; residualPercent: number; msrp: number }) => {
+    setInputs(prev => ({
+      ...prev,
+      moneyFactor: rate.moneyFactor,
+      residualPercent: rate.residualPercent,
+      msrp: rate.msrp,
+      sellingPrice: rate.msrp, // Start at MSRP, user can negotiate down
+    }));
+  };
 
   return (
     <div className="space-y-6">
@@ -30,6 +44,23 @@ export function LeaseCalculator() {
         </div>
       </div>
 
+      {/* Vehicle Lookup Buttons */}
+      <div className="flex gap-2">
+        <button
+          onClick={() => setShowVehicleSelector(true)}
+          className="flex-1 flex items-center justify-center gap-2 py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium rounded-xl transition-colors"
+        >
+          <Search size={18} />
+          Look Up Rates
+        </button>
+        <button
+          onClick={() => setShowSubmitRate(true)}
+          className="flex items-center justify-center gap-2 py-3 px-4 bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium rounded-xl transition-colors"
+        >
+          <Plus size={18} />
+        </button>
+      </div>
+
       {/* Core Inputs */}
       <div className="space-y-4">
         <h3 className="font-semibold text-gray-900">Vehicle Price</h3>
@@ -49,6 +80,11 @@ export function LeaseCalculator() {
             tooltip="Negotiated price before incentives"
           />
         </div>
+        {inputs.sellingPrice < inputs.msrp && (
+          <p className="text-sm text-green-600 bg-green-50 p-2 rounded">
+            ✓ {formatCurrency(inputs.msrp - inputs.sellingPrice)} below MSRP ({((1 - inputs.sellingPrice / inputs.msrp) * 100).toFixed(1)}% discount)
+          </p>
+        )}
       </div>
 
       <div className="space-y-4">
@@ -204,6 +240,18 @@ export function LeaseCalculator() {
         <RotateCcw size={16} />
         Reset to Defaults
       </button>
+
+      {/* Modals */}
+      {showVehicleSelector && (
+        <VehicleSelector
+          onSelect={handleVehicleSelect}
+          onClose={() => setShowVehicleSelector(false)}
+        />
+      )}
+
+      {showSubmitRate && (
+        <SubmitRate onClose={() => setShowSubmitRate(false)} />
+      )}
     </div>
   );
 }
