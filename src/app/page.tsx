@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { LeaseCalculator } from '@/components/calculators/LeaseCalculator';
 import { LoanCalculator } from '@/components/calculators/LoanCalculator';
+import { LeaseVsBuyComparison } from '@/components/calculators/LeaseVsBuyComparison';
 import { AIChat } from '@/components/ai/AIChat';
 import { Car, Calculator, Scale } from 'lucide-react';
 
@@ -68,25 +69,11 @@ export default function Home() {
       <div className="max-w-lg mx-auto px-4 py-6 pb-24">
         {activeTab === 'lease' && <LeaseCalculator />}
         {activeTab === 'loan' && <LoanCalculator />}
-        {activeTab === 'compare' && <ComparePlaceholder />}
+        {activeTab === 'compare' && <LeaseVsBuyComparison />}
       </div>
 
       {/* AI Chat */}
       <AIChat />
     </main>
-  );
-}
-
-function ComparePlaceholder() {
-  return (
-    <div className="text-center py-12">
-      <Scale size={48} className="mx-auto text-gray-300 mb-4" />
-      <h2 className="text-lg font-semibold text-gray-700 mb-2">
-        Lease vs. Buy Comparison
-      </h2>
-      <p className="text-gray-500 text-sm">
-        Coming soon! This will show a side-by-side comparison of leasing versus financing the same vehicle.
-      </p>
-    </div>
   );
 }
